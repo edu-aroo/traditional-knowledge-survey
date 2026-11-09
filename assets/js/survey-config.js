@@ -18,8 +18,8 @@ const SURVEY = {
   "organizer": "Fondation pour les Aires Protégées et la Biodiversité de Madagascar (FAPBM), en collaboration avec l’Institut Halieutique et des Sciences Marines (IH.SM) – Université de Toliara",
   "contactName": "David Jean-Marie",
   "contactEmail": "david.ihsm@gmail.com ",
-  "deadline": "15 Novembre 2026",
-  "estimatedTime": "45 à 75 min selon les volets",
+  "deadline": "20 Novembre 2026",
+  "estimatedTime": "45 min à 1h 15 min selon les volets",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbzmr1Yoa3bKhIFp0w96agyDtx6bPybO1nhbvPOOJ04q87qvxuDcSvsQ868CsFC0mtIqlw/exec",
   "logos": [
     {
