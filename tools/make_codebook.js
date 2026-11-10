@@ -12,6 +12,16 @@ for (const st of S.STEPS) {
     const base = { sheet: "Reponses", section: st.key, step: st.title, group: st.group || "", n: x.n,
                    required: x.required ? "Oui" : "Non", condition: cond, step_condition: stepCond };
     if (x.type === "file") { rows.push({ ...base, variable: x.id + "_nb_fichiers", label: "Nombre de documents joints", type: "number", options: "" }); continue; }
+    if (x.type === "matrix") {
+      // une variable par case ; les lignes filtrées (rowsFrom) ne sont remplies que si l'option a été cochée
+      for (const r of x.rows) for (const c of x.cols) {
+        const k = x.cols.length === 1 ? r.key : `${r.key}_${c.key}`;
+        rows.push({ ...base, variable: `${x.id}_${k}`, label: `${x.label} — ${r.label}` + (x.cols.length > 1 ? ` — ${c.label}` : ""),
+                    type: "matrix", options: c.options.join(" | "),
+                    condition: x.rowsFrom ? JSON.stringify({ q: x.rowsFrom, any: [r.label] }) : cond });
+      }
+      continue;
+    }
     if (x.type === "grid") {
       for (const r of x.rows) rows.push({ ...base, variable: `${x.id}_${r.key}`, label: `${x.label} — ${r.label}`,
                                           type: r.type === "text" ? "grid_text" : "grid", options: "" });

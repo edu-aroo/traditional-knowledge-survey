@@ -7,7 +7,7 @@
 
   const META = SURVEY.META;
   const MAX_METHODS = SURVEY.MAX_METHODS || 3;
-  const STORE_KEY = "cet-gestionnaires-draft-v" + META.version;
+  const STORE_KEY = "cet-gestionnaires-draft-v" + (META.draftVersion || META.version);   // brouillons conservés entre versions compatibles
   const HAS_METHODS = Array.isArray(SURVEY.METHOD_OPTIONS);   // blocs répétés par méthode (enquête herbiers) — absent ici
   const QDEF = {};
   SURVEY.STEPS.forEach(s => s.questions.forEach(q => { QDEF[q.id] = q; }));
@@ -246,6 +246,9 @@
         }).join("") + gUnit + `</div>`;
         break;
       }
+      case "matrix":
+        field = `<div class="matrix" data-matrix-for="${esc(q.rowsFrom || "")}">${renderMatrixInner(step, q)}</div>`;
+        break;
       case "datetime":
         field = `<input class="input" type="datetime-local" id="${uid}" name="${uid}" value="${esc(v || "")}">`;
         break;
@@ -300,7 +303,7 @@
     }
     const sigAttr = q.type === "methodpick" ? ` data-sig="${esc(selectedMethodNames().join("\u0001"))}"` : "";
     return `<div class="q" data-qid="${q.id}" data-type="${q.type}"${sigAttr} ${questionVisible(q, condAnswers(step)) ? "" : "hidden"}>
-      <div class="q-head">${num}<label class="q-label" ${["radio", "checkbox", "scale", "rank", "methodpick", "file", "grid"].includes(q.type) ? "" : `for="${uid}"`}>${esc(q.label)}${req}</label></div>
+      <div class="q-head">${num}<label class="q-label" ${["radio", "checkbox", "scale", "rank", "methodpick", "file", "grid", "matrix"].includes(q.type) ? "" : `for="${uid}"`}>${esc(q.label)}${req}</label></div>
       ${q.help ? `<p class="q-help">${esc(q.help)}</p>` : ""}
       <div class="q-field">${field}</div>
       <p class="q-error" role="alert"></p>
@@ -311,6 +314,27 @@
     const ans = scopeAnswers(step);
     return (ans[q.rankFrom] || []).map(o => isOther(o) ? (ans[q.rankFrom + "_autre"] ? "Autre : " + ans[q.rankFrom + "_autre"] : "Autre") : o);
   }
+  /* ---- tableau lignes × colonnes (type « matrix ») */
+  // Lignes affichées : toutes, ou seulement celles cochées à la question rowsFrom
+  function matrixRows(q, ans) {
+    if (!q.rowsFrom) return q.rows;
+    const sel = ans[q.rowsFrom] || [];
+    return q.rows.filter(r => sel.includes(r.label)).map(r => isOther(r.label)
+      ? Object.assign({}, r, { label: ans[q.rowsFrom + "_autre"] ? "Autre : " + ans[q.rowsFrom + "_autre"].trim() : "Autre" }) : r);
+  }
+  const cellKey = (q, r, c) => q.cols.length === 1 ? r.key : r.key + "_" + c.key;   // une seule colonne → q187_femmes
+  function renderMatrixInner(step, q) {
+    const ans = scopeAnswers(step), g = ans[q.id] || {}, uid = uidFor(step, q);
+    const rows = matrixRows(q, condAnswers(step));
+    if (!rows.length) return `<p class="muted">Cochez d'abord au moins une réponse à la question précédente.</p>`;
+    return `<table class="matrix-table"><thead><tr><th scope="col"><span class="sr-only">Élément</span></th>${q.cols.map(c => `<th scope="col">${esc(c.label)}</th>`).join("")}</tr></thead><tbody>` +
+      rows.map(r => `<tr><th scope="row">${esc(r.label)}</th>` + q.cols.map(c => {
+        const k = cellKey(q, r, c), cur = g[k] || "";
+        return `<td data-label="${esc(c.label)}"><select class="input" name="${uid}__${k}" data-cell="${k}" aria-label="${esc(r.label + " — " + c.label)}">
+          <option value="">— Choisir —</option>${c.options.map(o => `<option value="${esc(o)}" ${cur === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></td>`;
+      }).join("") + `</tr>`).join("") + `</tbody></table>`;
+  }
+
   function renderRankInner(step, q) {
     const choices = rankChoices(step, q);
     const ans = scopeAnswers(step);
@@ -415,6 +439,11 @@
         $$("[data-row]", qEl).forEach(i => { if (i.value.trim() !== "") g[i.dataset.row] = i.dataset.rtype === "text" ? i.value.trim() : Number(i.value); });
         ans[qid] = g; break;
       }
+      case "matrix": {
+        const g = {};
+        $$("[data-cell]", qEl).forEach(i => { if (i.value !== "") g[i.dataset.cell] = i.value; });
+        ans[qid] = g; break;
+      }
       case "file": break;
       default:
         ans[qid] = named(uid)[0].value;
@@ -463,6 +492,10 @@
       ans[rq.id] = (ans[rq.id] || []).filter(x => valid.includes(x));
       $(`.rank[data-rank-for="${qid}"]`).innerHTML = renderRankInner(step, rq);
     }
+    if (q) $$(`.matrix[data-matrix-for="${qid}"]`).forEach(el => {
+      const mq = step.def.questions.find(x => x.type === "matrix" && x.rowsFrom === qid);
+      el.innerHTML = renderMatrixInner(step, mq);
+    });
     if (q && q.type === "rank") {
       const rEl = $(".rank", qEl); rEl.innerHTML = renderRankInner(step, q);
     }
@@ -510,6 +543,12 @@
       const need = Math.min(q.ranks, rankChoices(step, q).length);
       if (q.required && need > 0 && (v || []).slice(0, need).filter(Boolean).length < need) return `Veuillez classer ${need} contrainte(s).`;
       return null;
+    }
+    if (q.type === "matrix") {
+      if (!q.required) return null;
+      const rows = matrixRows(q, condAnswers(step));
+      const miss = rows.some(r => q.cols.some(c => !(v || {})[cellKey(q, r, c)]));
+      return miss ? "Veuillez compléter toutes les cases du tableau." : null;
     }
     if (q.type === "grid") {
       if (q.required && !Object.keys(v || {}).length) return "Veuillez remplir au moins une ligne.";
@@ -581,6 +620,7 @@
     if (q.type === "file") return photos.length ? photos.length + " fichier(s) : " + photos.map(p => p.name).join(", ") : "";
     if (q.type === "scale") return v ? v + " — " + q.options[v - 1] : "";
     if (q.type === "rank") return (v || []).filter(Boolean).map((x, i) => (i + 1) + ". " + x).join(" ; ");
+    if (q.type === "matrix") return matrixRows(q, ans).map(r => r.label + " : " + q.cols.map(c => (v || {})[cellKey(q, r, c)] || "—").join(" / ")).join(" ; ");
     if (q.type === "grid") return q.rows.filter(r => (v || {})[r.key] != null).map(r => r.label + " : " + v[r.key]).join(" ; ") + (q.units && Object.keys(v || {}).length ? " (" + (ans[q.id + "_unite"] || q.units[0]) + ")" : "");
     if (q.units && v !== "" && v != null) return v + " " + (ans[q.id + "_unite"] || q.units[0]);
     let s = Array.isArray(v) ? v.join(" ; ") : (v == null ? "" : String(v));
@@ -696,6 +736,14 @@
           q.rows.forEach(r => { const x = vis ? (v || {})[r.key] : null; out[q.id + "_" + r.key] = x == null ? "" : x; });
           if (q.units) out[q.id + "_unite"] = vis && Object.keys(v || {}).length ? (ans[q.id + "_unite"] || q.units[0]) : "";
           return;
+        case "matrix": {
+          const shown = vis ? matrixRows(q, cAns).map(r => r.key) : [];
+          q.rows.forEach(r => q.cols.forEach(c => {
+            const k = cellKey(q, r, c);
+            out[q.id + "_" + k] = shown.includes(r.key) ? ((v || {})[k] || "") : "";
+          }));
+          return;
+        }
         case "checkbox": case "methodpick":
           out[q.id] = Array.isArray(v) ? v.join(SEP) : ""; break;
         default:

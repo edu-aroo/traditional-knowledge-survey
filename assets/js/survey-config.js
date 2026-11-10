@@ -4,7 +4,9 @@
    Les identifiants (id) deviennent les noms de colonnes dans Google Sheets et
    les noms de variables dans R : ne pas les modifier une fois la collecte lancée.
 
-   Types : text, email, textarea, number, year, radio, checkbox, scale, grid, file
+   Types : text, email, textarea, number, year, radio, checkbox, scale, grid, matrix, file
+   matrix : tableau lignes × colonnes à listes déroulantes (rows, cols[].options) ;
+            rowsFrom: "qXXX" → n'affiche que les lignes cochées à cette question
    Options : other, explain, detail, units, max, help,
              showIf {q, eq | ne | starts | any:[...] | notOnly}  (conditions en cascade)
    Étapes : showIf (étape entière), group (titre dans la barre latérale), photo (bandeau)
@@ -12,7 +14,8 @@
 
 const SURVEY = {
   META: {
-  "version": "1.0",
+  "version": "1.1",
+  "draftVersion": "1.0",
   "title": "Enquête sur la documentation des savoirs écologiques locaux dans la gestion des aires marines à Madagascar",
   "subtitle": "Questionnaire A — gestionnaires d'AMP, de LMMA et partenaires d'appui",
   "organizer": "Fondation pour les Aires Protégées et la Biodiversité de Madagascar (FAPBM), en collaboration avec l’Institut Halieutique et des Sciences Marines (IH.SM) – Université de Toliara",
@@ -3030,6 +3033,591 @@ const SURVEY = {
     ]
   },
   {
+    "key": "CE1",
+    "title": "Connaissances générales sur les écosystèmes locaux",
+    "short": "Écosystèmes locaux",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 1",
+    "photo": "estran-belo",
+    "questions": [
+      {
+        "id": "q177",
+        "n": 177,
+        "label": "Parmi les milieux suivants, lesquels sont présents dans l'aire que vous gérez ou appuyez, lesquels sont suivis et lesquels ont fait l'objet d'un recueil de savoirs locaux ?",
+        "required": true,
+        "type": "matrix",
+        "rows": [
+          {
+            "key": "plages",
+            "label": "Plages et zones intertidales"
+          },
+          {
+            "key": "fonds_sableux",
+            "label": "Fonds sableux"
+          },
+          {
+            "key": "fonds_rocheux",
+            "label": "Fonds rocheux"
+          },
+          {
+            "key": "estuaires",
+            "label": "Estuaires et lagunes"
+          },
+          {
+            "key": "cours_eau",
+            "label": "Cours d'eau et zones humides"
+          }
+        ],
+        "cols": [
+          {
+            "key": "present",
+            "label": "Présent",
+            "options": [
+              "Oui",
+              "Non",
+              "Ne sait pas"
+            ]
+          },
+          {
+            "key": "suivi",
+            "label": "Suivi",
+            "options": [
+              "Oui",
+              "Non",
+              "Ne sait pas"
+            ]
+          },
+          {
+            "key": "savoirs",
+            "label": "Savoirs locaux recueillis",
+            "options": [
+              "Oui",
+              "Non",
+              "Ne sait pas"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q178",
+        "n": 178,
+        "label": "Quels sont, selon vous, les milieux les plus importants pour les communautés riveraines, et pourquoi ?",
+        "required": true,
+        "type": "textarea"
+      }
+    ]
+  },
+  {
+    "key": "CE2",
+    "title": "Biodiversité et fonctionnement écologique",
+    "short": "Biodiversité",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 2",
+    "photo": "mangrove-belo",
+    "questions": [
+      {
+        "id": "q179",
+        "n": 179,
+        "label": "Votre structure a-t-elle identifié des zones de nurserie, de reproduction ou de refuge dans les mangroves, les herbiers ou les récifs ? Sur quelle base ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Aucune zone identifiée",
+          "Sur la base de suivis scientifiques",
+          "Sur la base de savoirs locaux",
+          "Zones cartographiées",
+          "Autre"
+        ],
+        "other": true
+      }
+    ]
+  },
+  {
+    "key": "CE3",
+    "title": "Saisons, climat et phénomènes naturels",
+    "short": "Saisons et climat",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 3",
+    "photo": "pirogues-voile",
+    "questions": [
+      {
+        "id": "q180",
+        "n": 180,
+        "label": "Les observations locales sur les saisons, les marées, les vents et les phénomènes naturels sont-elles prises en compte dans la planification des suivis et des actions de gestion ?",
+        "required": true,
+        "type": "radio",
+        "options": [
+          "Oui",
+          "En partie",
+          "Non"
+        ]
+      },
+      {
+        "id": "q181",
+        "n": 181,
+        "label": "Quels événements climatiques ou naturels ont touché les milieux ou les activités marines au cours des dix dernières années ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Cyclone",
+          "Fortes pluies ou crues",
+          "Sécheresse",
+          "Érosion côtière ou montée du niveau de la mer",
+          "Blanchissement corallien",
+          "Autre"
+        ],
+        "other": true
+      }
+    ]
+  },
+  {
+    "key": "CE4",
+    "title": "Pratiques traditionnelles d'utilisation et d'exploitation",
+    "short": "Pratiques traditionnelles",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 4",
+    "photo": "nasses",
+    "questions": [
+      {
+        "id": "q182",
+        "n": 182,
+        "label": "Quelles pratiques traditionnelles d'exploitation ou de conservation des ressources votre structure connaît-elle ou appuie-t-elle ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Rotation ou repos de sites",
+          "Fermeture saisonnière",
+          "Techniques sélectives",
+          "Respect de tailles minimales",
+          "Prélèvement réservé à certains groupes",
+          "Aucune",
+          "Autre"
+        ],
+        "other": true
+      },
+      {
+        "id": "q183",
+        "n": 183,
+        "label": "Ces pratiques sont-elles documentées ou intégrées dans les plans de gestion ?",
+        "required": false,
+        "type": "radio",
+        "options": [
+          "Documentées",
+          "Intégrées au plan de gestion",
+          "Les deux",
+          "Aucune des deux",
+          "Ne sait pas"
+        ],
+        "showIf": {
+          "q": "q182",
+          "notOnly": "Aucune"
+        }
+      }
+    ]
+  },
+  {
+    "key": "CE5",
+    "title": "Gestion communautaire, règles coutumières et valeurs culturelles",
+    "short": "Règles coutumières",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 5",
+    "photo": "village-mangily",
+    "questions": [
+      {
+        "id": "q184",
+        "n": 184,
+        "label": "Quelles instances traditionnelles ou communautaires participent à la gouvernance de l'aire, et avec quel rôle ?",
+        "required": true,
+        "type": "textarea",
+        "help": "Ex. : anciens, autorités traditionnelles, VOI / COBA, associations de pêcheurs, comités locaux"
+      },
+      {
+        "id": "q185",
+        "n": 185,
+        "label": "Comment les règles coutumières (fady, dina) s'articulent-elles avec la réglementation officielle et les dispositifs AMP / LMMA ?",
+        "required": true,
+        "type": "radio",
+        "options": [
+          "Complémentaires",
+          "Partiellement en conflit",
+          "En conflit",
+          "Sans lien",
+          "Ne sait pas"
+        ]
+      },
+      {
+        "id": "q186",
+        "n": 186,
+        "label": "S'il existe un conflit ou un décalage, lesquels ?",
+        "required": false,
+        "type": "textarea",
+        "showIf": {
+          "q": "q185",
+          "any": [
+            "Partiellement en conflit",
+            "En conflit"
+          ]
+        }
+      },
+      {
+        "id": "q187",
+        "n": 187,
+        "label": "Dans quelle mesure les femmes, les jeunes et les migrants participent-ils aux décisions de gestion ?",
+        "required": true,
+        "type": "matrix",
+        "rows": [
+          {
+            "key": "femmes",
+            "label": "Femmes"
+          },
+          {
+            "key": "jeunes",
+            "label": "Jeunes"
+          },
+          {
+            "key": "migrants",
+            "label": "Migrants"
+          }
+        ],
+        "cols": [
+          {
+            "key": "niveau",
+            "label": "Niveau de participation",
+            "options": [
+              "Absents",
+              "Consultés",
+              "Participent à la décision"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q188",
+        "n": 188,
+        "label": "Comment les infractions aux règles sont-elles traitées ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Sanction coutumière",
+          "Amende prévue par le dina",
+          "Médiation des anciens",
+          "Signalement à l'administration",
+          "Aucune suite",
+          "Autre"
+        ],
+        "other": true
+      }
+    ]
+  },
+  {
+    "key": "CE6",
+    "title": "Relations entre écosystèmes et activités humaines",
+    "short": "Pressions humaines",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 6",
+    "photo": "femmes-filet",
+    "questions": [
+      {
+        "id": "q189",
+        "n": 189,
+        "label": "Les liens écologiques entre mangroves, herbiers et récifs sont-ils pris en compte dans le zonage ou dans les plans de gestion ?",
+        "required": true,
+        "type": "radio",
+        "options": [
+          "Oui",
+          "En partie",
+          "Non",
+          "Ne sait pas"
+        ]
+      },
+      {
+        "id": "q190",
+        "n": 190,
+        "label": "Quelles sont les principales pressions humaines exercées sur les milieux de l'aire ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Coupe de mangrove (bois, charbon)",
+          "Engins ou pratiques de pêche destructeurs",
+          "Surpêche",
+          "Piétinement et collecte excessive à pied",
+          "Ancrage",
+          "Pollution et déchets",
+          "Sédimentation et érosion du bassin versant",
+          "Extraction de sable ou de corail",
+          "Tourisme et construction littorale",
+          "Défrichement et agriculture",
+          "Autre"
+        ],
+        "other": true
+      },
+      {
+        "id": "q191",
+        "n": 191,
+        "label": "Pour chaque pression citée, quel est le milieu le plus touché et quelle est la tendance ?",
+        "required": true,
+        "type": "matrix",
+        "rowsFrom": "q190",
+        "help": "Les lignes correspondent aux pressions cochées à la question précédente.",
+        "rows": [
+          {
+            "key": "mangrove",
+            "label": "Coupe de mangrove (bois, charbon)"
+          },
+          {
+            "key": "engins",
+            "label": "Engins ou pratiques de pêche destructeurs"
+          },
+          {
+            "key": "surpeche",
+            "label": "Surpêche"
+          },
+          {
+            "key": "pietinement",
+            "label": "Piétinement et collecte excessive à pied"
+          },
+          {
+            "key": "ancrage",
+            "label": "Ancrage"
+          },
+          {
+            "key": "pollution",
+            "label": "Pollution et déchets"
+          },
+          {
+            "key": "sedimentation",
+            "label": "Sédimentation et érosion du bassin versant"
+          },
+          {
+            "key": "extraction",
+            "label": "Extraction de sable ou de corail"
+          },
+          {
+            "key": "tourisme",
+            "label": "Tourisme et construction littorale"
+          },
+          {
+            "key": "defrichement",
+            "label": "Défrichement et agriculture"
+          },
+          {
+            "key": "autre",
+            "label": "Autre"
+          }
+        ],
+        "cols": [
+          {
+            "key": "milieu",
+            "label": "Milieu le plus touché",
+            "options": [
+              "Mangrove",
+              "Herbier",
+              "Récif",
+              "Estran"
+            ]
+          },
+          {
+            "key": "tendance",
+            "label": "Tendance",
+            "options": [
+              "En hausse",
+              "Stable",
+              "En baisse"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q192",
+        "n": 192,
+        "label": "Pouvez-vous donner un exemple où la dégradation d'un milieu a eu des effets sur un autre milieu ou sur les ressources pêchées ?",
+        "required": false,
+        "type": "textarea"
+      },
+      {
+        "id": "q193",
+        "n": 193,
+        "label": "Quelles mesures de gestion ou de conservation limitent aujourd'hui ces pressions ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Zonage ou réserve",
+          "Fermeture temporaire",
+          "Dina",
+          "Patrouilles et surveillance",
+          "Sensibilisation",
+          "Activités alternatives de revenu",
+          "Restauration",
+          "Aucune",
+          "Autre"
+        ],
+        "other": true
+      },
+      {
+        "id": "q194",
+        "n": 194,
+        "label": "Quelles initiatives menées par les communautés ont donné de bons résultats, et pourquoi ?",
+        "required": false,
+        "type": "textarea"
+      }
+    ]
+  },
+  {
+    "key": "CE7",
+    "title": "Évolution des écosystèmes et changements environnementaux",
+    "short": "Évolution des milieux",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axe 7",
+    "photo": "lagon-anakao",
+    "questions": [
+      {
+        "id": "q195",
+        "n": 195,
+        "label": "Disposez-vous de données, de cartes ou d'images permettant de suivre l'évolution de la superficie des milieux ?",
+        "required": true,
+        "type": "radio",
+        "options": [
+          "Oui, chiffrées (cartes, images satellitaires, relevés)",
+          "Oui, descriptives seulement",
+          "Non",
+          "Ne sait pas"
+        ]
+      },
+      {
+        "id": "q196",
+        "n": 196,
+        "label": "Depuis le début du suivi, ou depuis dix ans, comment l'état de chaque milieu a-t-il évolué ?",
+        "required": true,
+        "type": "matrix",
+        "rows": [
+          {
+            "key": "mangroves",
+            "label": "Mangroves"
+          },
+          {
+            "key": "herbiers",
+            "label": "Herbiers"
+          },
+          {
+            "key": "recifs",
+            "label": "Récifs"
+          },
+          {
+            "key": "plages_estran",
+            "label": "Plages et estran"
+          }
+        ],
+        "cols": [
+          {
+            "key": "etat",
+            "label": "Évolution",
+            "options": [
+              "Amélioration",
+              "Stable",
+              "Dégradation",
+              "Ne sait pas"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q197",
+        "n": 197,
+        "label": "Quelles sont, selon vous, les principales causes de ces changements (naturelles et humaines) ?",
+        "required": true,
+        "type": "textarea"
+      }
+    ]
+  },
+  {
+    "key": "CE8",
+    "title": "Transmission, documentation et valorisation des savoirs",
+    "short": "Transmission et valorisation",
+    "group": "Savoirs écologiques locaux",
+    "eyebrow": "Axes 8 et 9",
+    "photo": "vezo-pirogue",
+    "questions": [
+      {
+        "id": "q198",
+        "n": 198,
+        "label": "Quels obstacles freinent la transmission des savoirs sur la mer dans les villages que vous appuyez ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Départ des jeunes (école, ville)",
+          "Désintérêt des jeunes",
+          "Disparition des anciens",
+          "Changement des activités et des engins",
+          "Évolution des croyances",
+          "Absence de lieux ou d'occasions d'échange",
+          "Autre"
+        ],
+        "other": true
+      },
+      {
+        "id": "q199",
+        "n": 199,
+        "label": "Quelles seraient, pour votre structure, les priorités de préservation et de valorisation des savoirs locaux ?",
+        "required": true,
+        "type": "checkbox",
+        "options": [
+          "Inventaire écrit",
+          "Base de données",
+          "Cartes",
+          "Supports scolaires",
+          "Audio ou vidéo",
+          "Fêtes et rites",
+          "Intégration au plan de gestion",
+          "Publication",
+          "Autre"
+        ],
+        "other": true
+      },
+      {
+        "id": "q200",
+        "n": 200,
+        "label": "Quel rôle pourraient jouer l'école, les associations, l'AMP / LMMA, les ONG et les institutions scientifiques ?",
+        "required": true,
+        "type": "grid",
+        "help": "Indiquez le rôle proposé pour chaque acteur (au moins une ligne).",
+        "rows": [
+          {
+            "key": "ecole",
+            "label": "École",
+            "type": "text"
+          },
+          {
+            "key": "association",
+            "label": "Association",
+            "type": "text"
+          },
+          {
+            "key": "amp_lmma",
+            "label": "AMP / LMMA",
+            "type": "text"
+          },
+          {
+            "key": "ong",
+            "label": "ONG",
+            "type": "text"
+          },
+          {
+            "key": "institution",
+            "label": "Institution scientifique",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "id": "q201",
+        "n": 201,
+        "label": "Quelles recommandations feriez-vous pour améliorer la documentation et la valorisation des CET dans votre aire ?",
+        "required": true,
+        "type": "textarea"
+      }
+    ]
+  },
+  {
     "key": "FFOM",
     "title": "Clôture : forces, faiblesses, opportunités et menaces",
     "short": "Clôture (FFOM)",
@@ -3037,28 +3625,28 @@ const SURVEY = {
     "questions": [
       {
         "id": "q171",
-        "n": 171,
+        "n": 202,
         "label": "Quelle est la principale force de votre façon de documenter ces savoirs ?",
         "required": true,
         "type": "textarea"
       },
       {
         "id": "q172",
-        "n": 172,
+        "n": 203,
         "label": "Quelle est sa principale faiblesse ?",
         "required": true,
         "type": "textarea"
       },
       {
         "id": "q173",
-        "n": 173,
+        "n": 204,
         "label": "Qu'est-ce qui faciliterait ou menacerait ce travail dans les prochaines années ?",
         "required": true,
         "type": "textarea"
       },
       {
         "id": "q174",
-        "n": 174,
+        "n": 205,
         "label": "Que devrait contenir, selon vous, un cadre national harmonisé ?",
         "required": true,
         "type": "textarea"
@@ -3074,7 +3662,7 @@ const SURVEY = {
     "questions": [
       {
         "id": "q176",
-        "n": 176,
+        "n": 206,
         "label": "Quels documents pouvez-vous partager avec l'équipe de recherche ?",
         "required": false,
         "type": "checkbox",
@@ -3094,7 +3682,7 @@ const SURVEY = {
       },
       {
         "id": "docs",
-        "n": "176b",
+        "n": "206b",
         "label": "Joindre les documents (facultatif)",
         "type": "file",
         "required": false,
